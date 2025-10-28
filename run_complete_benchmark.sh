@@ -66,7 +66,7 @@ sleep 2
 echo -n "PostgreSQL: "
 READY=false
 for i in {1..30}; do
-    if docker exec puppygraph_postgres pg_isready -U postgres &> /dev/null; then
+    if docker exec graph_benchmark_postgres pg_isready -U postgres &> /dev/null; then
         print_success "Ready"
         READY=true
         break
@@ -77,7 +77,7 @@ done
 if [ "$READY" = false ]; then
     echo ""
     print_error "PostgreSQL failed to start after 30 seconds"
-    print_info "Check logs: docker logs puppygraph_postgres"
+    print_info "Check logs: docker logs graph_benchmark_postgres"
     exit 1
 fi
 
@@ -85,7 +85,7 @@ fi
 echo -n "Neo4j: "
 READY=false
 for i in {1..60}; do
-    if docker exec puppygraph_neo4j wget --no-verbose --tries=1 --spider http://localhost:7474 &> /dev/null; then
+    if docker exec graph_benchmark_neo4j wget --no-verbose --tries=1 --spider http://localhost:7474 &> /dev/null; then
         print_success "Ready"
         READY=true
         break
@@ -96,7 +96,7 @@ done
 if [ "$READY" = false ]; then
     echo ""
     print_error "Neo4j failed to start after 60 seconds"
-    print_info "Check logs: docker logs puppygraph_neo4j"
+    print_info "Check logs: docker logs graph_benchmark_neo4j"
     exit 1
 fi
 
@@ -104,7 +104,7 @@ fi
 echo -n "PuppyGraph: "
 READY=false
 for i in {1..30}; do
-    if docker exec puppygraph_puppygraph wget --no-verbose --tries=1 --spider http://localhost:8081 &> /dev/null; then
+    if docker exec graph_benchmark_puppygraph wget --no-verbose --tries=1 --spider http://localhost:8081 &> /dev/null; then
         print_success "Ready"
         READY=true
         break
@@ -115,7 +115,7 @@ done
 if [ "$READY" = false ]; then
     echo ""
     print_error "PuppyGraph failed to start after 30 seconds"
-    print_info "Check logs: docker logs puppygraph_puppygraph"
+    print_info "Check logs: docker logs graph_benchmark_puppygraph"
     exit 1
 fi
 

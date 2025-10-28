@@ -112,7 +112,7 @@ class PuppyGraphSetup:
             # Copy schema file into PuppyGraph container
             import subprocess
             result = subprocess.run(
-                ["docker", "cp", schema_path, "puppygraph_puppygraph:/tmp/schema.json"],
+                ["docker", "cp", schema_path, "graph_benchmark_puppygraph:/tmp/schema.json"],
                 capture_output=True,
                 text=True
             )
@@ -122,7 +122,7 @@ class PuppyGraphSetup:
                 print(f"\nTo load the schema, you have two options:")
                 print(f"1. Web UI: Visit http://localhost:8081 and upload /tmp/schema.json")
                 print(f"2. Command line:")
-                print(f"   docker exec puppygraph_puppygraph puppygraph-cli import-schema /tmp/schema.json")
+                print(f"   docker exec graph_benchmark_puppygraph puppygraph-cli import-schema /tmp/schema.json")
                 return True
             else:
                 print(f"Failed to copy schema file: {result.stderr}")

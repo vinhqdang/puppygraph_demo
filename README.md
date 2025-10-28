@@ -187,15 +187,18 @@ docker compose restart
 
 **Connection Details:**
 - **PostgreSQL**: `localhost:5432`
+  - Container: graph_benchmark_postgres
   - User: postgres
   - Password: postgres
   - Database: banking_db
 
 - **Neo4j**:
+  - Container: graph_benchmark_neo4j
   - Bolt: `localhost:7687` (user: neo4j, password: password)
   - Web UI: `http://localhost:7474`
 
 - **PuppyGraph**:
+  - Container: graph_benchmark_puppygraph
   - HTTP API: `localhost:8081`
   - Gremlin: `localhost:8182`
   - Password: puppygraph123
@@ -407,29 +410,38 @@ class PostgresQueries:
 
 ### PostgreSQL Connection Issues
 ```bash
-# Check if PostgreSQL is running
-sudo service postgresql status
+# Check container status
+docker ps --filter "name=graph_benchmark_postgres"
+
+# Check logs
+docker logs graph_benchmark_postgres
 
 # Verify connection
-psql -U postgres -h localhost -c "SELECT version();"
+docker exec graph_benchmark_postgres psql -U postgres -c "SELECT version();"
 ```
 
 ### Neo4j Connection Issues
 ```bash
-# Check if Neo4j is running
-neo4j status
+# Check container status
+docker ps --filter "name=graph_benchmark_neo4j"
 
 # Check logs
-neo4j console
+docker logs graph_benchmark_neo4j
+
+# Test connection
+curl http://localhost:7474
 ```
 
 ### PuppyGraph Connection Issues
 ```bash
-# Verify PuppyGraph is running
-curl http://localhost:8081/health
+# Check container status
+docker ps --filter "name=graph_benchmark_puppygraph"
 
-# Check Gremlin endpoint
-# Should be accessible at ws://localhost:8182/gremlin
+# Check logs
+docker logs graph_benchmark_puppygraph
+
+# Verify PuppyGraph is running
+curl http://localhost:8081
 ```
 
 **Important Note About PuppyGraph Setup:**

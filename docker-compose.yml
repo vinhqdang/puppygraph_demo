@@ -1,8 +1,10 @@
+name: graph_benchmark
+
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: puppygraph_postgres
+    container_name: graph_benchmark_postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -20,7 +22,7 @@ services:
   # Neo4j Graph Database
   neo4j:
     image: neo4j:5.15.0-community
-    container_name: puppygraph_neo4j
+    container_name: graph_benchmark_neo4j
     environment:
       NEO4J_AUTH: neo4j/password
       NEO4J_PLUGINS: '["apoc"]'
@@ -46,7 +48,7 @@ services:
   # PuppyGraph
   puppygraph:
     image: puppygraph/puppygraph:stable
-    container_name: puppygraph_puppygraph
+    container_name: graph_benchmark_puppygraph
     environment:
       PUPPYGRAPH_PASSWORD: puppygraph123
       QUERY_TIMEOUT: 5m
