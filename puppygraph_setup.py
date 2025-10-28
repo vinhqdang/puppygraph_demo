@@ -54,52 +54,28 @@ class PuppyGraphSetup:
         Returns:
             Schema configuration dictionary
         """
-        data_dir = os.path.abspath(self.config.DATA_DIR)
+        # Use Docker container path since PuppyGraph runs in Docker
+        # The data directory is mounted as /data in the container
+        data_dir = "/data"
 
+        # Simplified schema format for PuppyGraph
+        # PuppyGraph will auto-detect column names from CSV headers
         schema = {
             "vertices": [
                 {
                     "label": "Customer",
-                    "source": {
-                        "type": "csv",
-                        "path": f"{data_dir}/customers.csv",
-                        "delimiter": ","
-                    },
-                    "id": "customer_id",
-                    "attributes": [
-                        {"name": "customer_id", "type": "string"},
-                        {"name": "name", "type": "string"},
-                        {"name": "email", "type": "string"},
-                        {"name": "account_balance", "type": "double"},
-                        {"name": "risk_score", "type": "double"},
-                        {"name": "account_type", "type": "string"},
-                        {"name": "registration_date", "type": "string"}
-                    ]
+                    "file": f"{data_dir}/customers.csv",
+                    "id": "customer_id"
                 }
             ],
             "edges": [
                 {
                     "label": "TRANSFERRED",
-                    "source": {
-                        "type": "csv",
-                        "path": f"{data_dir}/transactions.csv",
-                        "delimiter": ","
-                    },
-                    "from": {
-                        "vertex_label": "Customer",
-                        "id_field": "from_customer_id"
-                    },
-                    "to": {
-                        "vertex_label": "Customer",
-                        "id_field": "to_customer_id"
-                    },
-                    "attributes": [
-                        {"name": "transaction_id", "type": "string"},
-                        {"name": "amount", "type": "double"},
-                        {"name": "transaction_date", "type": "string"},
-                        {"name": "transaction_type", "type": "string"},
-                        {"name": "status", "type": "string"}
-                    ]
+                    "file": f"{data_dir}/transactions.csv",
+                    "from": "Customer",
+                    "from_id": "from_customer_id",
+                    "to": "Customer",
+                    "to_id": "to_customer_id"
                 }
             ]
         }
@@ -121,6 +97,40 @@ class PuppyGraphSetup:
 
         print(f"Schema configuration saved to: {schema_path}")
         return schema_path
+
+    def load_schema_via_file(self) -> bool:
+        """
+        Copy schema file into PuppyGraph container for loading.
+
+        Returns:
+            True if schema file copied successfully
+        """
+        print("Preparing schema for PuppyGraph...")
+        try:
+            schema_path = os.path.join(os.path.dirname(__file__), "puppygraph_schema.json")
+
+            # Copy schema file into PuppyGraph container
+            import subprocess
+            result = subprocess.run(
+                ["docker", "cp", schema_path, "puppygraph_puppygraph:/tmp/schema.json"],
+                capture_output=True,
+                text=True
+            )
+
+            if result.returncode == 0:
+                print(f"Schema file copied to PuppyGraph container")
+                print(f"\nTo load the schema, you have two options:")
+                print(f"1. Web UI: Visit http://localhost:8081 and upload /tmp/schema.json")
+                print(f"2. Command line:")
+                print(f"   docker exec puppygraph_puppygraph puppygraph-cli import-schema /tmp/schema.json")
+                return True
+            else:
+                print(f"Failed to copy schema file: {result.stderr}")
+                return False
+
+        except Exception as e:
+            print(f"Error preparing schema: {e}")
+            return False
 
     def test_query(self) -> None:
         """Test basic queries on PuppyGraph."""
@@ -179,19 +189,27 @@ def main():
         # Create and save schema configuration
         schema_path = setup.save_schema_config()
 
+        # Provide instructions for loading schema
         print("\n" + "=" * 60)
-        print("PuppyGraph Setup Instructions:")
+        print("PuppyGraph Schema Setup Instructions")
         print("=" * 60)
-        print("1. Ensure PuppyGraph is running on localhost")
-        print("2. Use the generated schema file to configure PuppyGraph:")
+        print(f"Schema file generated at: {schema_path}")
+        print(f"\nPuppyGraph is running at: http://localhost:8081")
+        print(f"")
+        print(f"⚠️  MANUAL STEP REQUIRED:")
+        print(f"PuppyGraph schema must be loaded through the web UI.")
+        print(f"")
+        print(f"Steps to load schema:")
+        print(f"1. Open http://localhost:8081 in your browser")
+        print(f"2. Login with password: puppygraph123")
+        print(f"3. Navigate to Schema/Configuration section")
+        print(f"4. Upload the generated schema file:")
         print(f"   {schema_path}")
-        print("3. Load the schema into PuppyGraph using the web UI or API")
+        print(f"")
+        print(f"📝 Note: The benchmark will proceed without PuppyGraph")
+        print(f"   if schema is not loaded. PostgreSQL and Neo4j will")
+        print(f"   still be benchmarked successfully.")
         print("=" * 60)
-
-        # Try to test queries if connected (skip if schema not loaded)
-        if setup.verify_connection():
-            print("\nNote: Query tests skipped. Load the schema first using PuppyGraph UI/API.")
-            print("After loading the schema, you can test queries manually.")
 
         elapsed_time = time.time() - start_time
 
