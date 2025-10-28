@@ -103,30 +103,22 @@ echo "Neo4j UI:   http://localhost:7474"
 echo "PuppyGraph: localhost:8081, localhost:8182"
 echo ""
 
-# Step 5: Activate conda and run benchmark
-print_info "Activating conda environment and running benchmark..."
+# Step 5: Run benchmark
+print_info "Running benchmark..."
+echo ""
+print_info "Note: Make sure you have activated the conda environment before running this script"
 echo ""
 
-# Get conda base directory
-if command -v conda &> /dev/null; then
-    CONDA_BASE=$(conda info --base)
-    source "$CONDA_BASE/etc/profile.d/conda.sh"
-    conda activate py310
+# Run the complete benchmark
+python run_all.py
 
-    # Run the complete benchmark
-    python run_all.py
-
-    echo ""
-    print_success "Benchmark completed successfully!"
-    echo ""
-    print_info "Results saved to results/ directory"
-    echo "  - benchmark_summary.csv"
-    echo "  - performance_comparison.png"
-    echo "  - Detailed results for each database"
-else
-    print_error "Conda not found. Running without conda environment..."
-    python run_all.py
-fi
+echo ""
+print_success "Benchmark completed successfully!"
+echo ""
+print_info "Results saved to results/ directory"
+echo "  - benchmark_summary.csv"
+echo "  - performance_comparison.png"
+echo "  - Detailed results for each database"
 
 echo ""
 echo "========================================"

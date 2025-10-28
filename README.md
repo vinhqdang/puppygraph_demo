@@ -108,6 +108,9 @@ g.V().has('Customer', 'customer_id', customer_id)
 **Single Command to Run Everything:**
 
 ```bash
+# Activate conda environment first
+conda activate py310
+
 # Start all 3 databases, run benchmark, and cleanup
 ./run_complete_benchmark.sh
 ```
@@ -119,6 +122,8 @@ This automated script will:
 4. Setup databases and load data
 5. Run performance benchmark on all three systems
 6. Stop all databases when complete
+
+**Note:** Make sure you have activated the conda environment (py310) before running the script.
 
 **Alternative (step-by-step):**
 
