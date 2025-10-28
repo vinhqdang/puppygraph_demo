@@ -28,21 +28,26 @@ For each customer, we calculate:
 
 ```
 puppygraph_demo/
-├── config.py                  # Configuration for all databases
-├── data_generator.py          # Synthetic banking data generator
-├── postgres_setup.py          # PostgreSQL database setup
-├── neo4j_setup.py            # Neo4j database setup
-├── puppygraph_setup.py       # PuppyGraph schema configuration
-├── queries.py                # Query implementations for all three systems
-├── benchmark.py              # Performance benchmarking script
-├── run_all.py               # Complete pipeline orchestrator
-├── requirements.txt          # Python dependencies
-├── puppygraph_schema.json   # PuppyGraph schema (generated)
-├── data/                    # Generated CSV files
+├── config.py                      # Configuration for all databases
+├── data_generator.py              # Synthetic banking data generator
+├── postgres_setup.py              # PostgreSQL database setup
+├── neo4j_setup.py                # Neo4j database setup
+├── puppygraph_setup.py           # PuppyGraph schema configuration
+├── queries.py                    # Query implementations for all three systems
+├── benchmark.py                  # Performance benchmarking script
+├── run_all.py                   # Complete pipeline orchestrator
+├── run_complete_benchmark.sh    # ONE COMMAND: Start DBs + Run + Cleanup
+├── setup_databases.sh           # Start all 3 databases with Docker
+├── setup_env.sh                # Conda environment setup
+├── quick_start.sh              # Legacy quick start script
+├── docker-compose.yml           # Docker config for all 3 databases
+├── requirements.txt             # Python dependencies
+├── puppygraph_schema.json      # PuppyGraph schema (generated)
+├── data/                       # Generated CSV files
 │   ├── customers.csv
 │   ├── transactions.csv
 │   └── card_transactions.csv
-└── results/                 # Benchmark results
+└── results/                    # Benchmark results
     ├── benchmark_summary.csv
     ├── performance_comparison.png
     └── *_detailed_results.csv
@@ -98,15 +103,99 @@ g.V().has('Customer', 'customer_id', customer_id)
   .by(__.unfold().values('amount').mean())
 ```
 
+## Quick Start (Easiest Way)
+
+**Single Command to Run Everything:**
+
+```bash
+# Start all 3 databases, run benchmark, and cleanup
+./run_complete_benchmark.sh
+```
+
+This automated script will:
+1. Start PostgreSQL, Neo4j, and PuppyGraph using Docker
+2. Wait for all databases to be ready
+3. Generate synthetic banking data
+4. Setup databases and load data
+5. Run performance benchmark on all three systems
+6. Stop all databases when complete
+
+**Alternative (step-by-step):**
+
+```bash
+# 1. Start all databases
+./setup_databases.sh
+
+# 2. Setup Python environment
+conda activate py310
+
+# 3. Run the complete benchmark pipeline
+python run_all.py
+```
+
 ## Prerequisites
 
 ### Software Requirements
 1. **Python 3.10** (using conda environment)
-2. **PostgreSQL** (version 12 or higher)
-3. **Neo4j** (version 5.x)
-4. **PuppyGraph** (running on localhost with default ports)
+2. **Docker** - All three databases (PostgreSQL, Neo4j, PuppyGraph) run in Docker containers
 
-### Database Setup
+## Database Setup
+
+### Automated Docker Setup (RECOMMENDED)
+
+All three databases run in Docker containers for easy setup:
+
+```bash
+# Automated setup - starts all databases
+./setup_databases.sh
+
+# Or manually with docker compose
+docker compose up -d
+```
+
+The script will:
+- Check if Docker is installed (and offer to install it if not)
+- Start PostgreSQL, Neo4j, and PuppyGraph containers
+- Wait for all databases to be ready
+- Display connection information
+
+**Docker Management Commands:**
+```bash
+# Start all databases
+docker compose up -d
+
+# Check status
+docker compose ps
+
+# View logs
+docker compose logs -f
+
+# Stop databases (keeps data)
+docker compose down
+
+# Stop and remove all data
+docker compose down -v
+
+# Restart databases
+docker compose restart
+```
+
+**Connection Details:**
+- **PostgreSQL**: `localhost:5432`
+  - User: postgres
+  - Password: postgres
+  - Database: banking_db
+
+- **Neo4j**:
+  - Bolt: `localhost:7687` (user: neo4j, password: password)
+  - Web UI: `http://localhost:7474`
+
+- **PuppyGraph**:
+  - HTTP API: `localhost:8081`
+  - Gremlin: `localhost:8182`
+  - Password: puppygraph123
+
+### Option 2: Manual Installation
 
 #### PostgreSQL
 ```bash
