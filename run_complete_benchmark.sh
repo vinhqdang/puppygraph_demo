@@ -59,38 +59,65 @@ docker compose up -d
 echo ""
 print_info "Waiting for databases to be ready..."
 
+# Give containers a moment to start
+sleep 2
+
 # Wait for PostgreSQL
 echo -n "PostgreSQL: "
+READY=false
 for i in {1..30}; do
     if docker exec puppygraph_postgres pg_isready -U postgres &> /dev/null; then
         print_success "Ready"
+        READY=true
         break
     fi
     echo -n "."
     sleep 1
 done
+if [ "$READY" = false ]; then
+    echo ""
+    print_error "PostgreSQL failed to start after 30 seconds"
+    print_info "Check logs: docker logs puppygraph_postgres"
+    exit 1
+fi
 
 # Wait for Neo4j
 echo -n "Neo4j: "
+READY=false
 for i in {1..60}; do
-    if docker exec puppygraph_neo4j wget --no-verbose --tries=1 --spider http://localhost:7474 &> /dev/null 2>&1; then
+    if docker exec puppygraph_neo4j wget --no-verbose --tries=1 --spider http://localhost:7474 &> /dev/null; then
         print_success "Ready"
+        READY=true
         break
     fi
     echo -n "."
     sleep 1
 done
+if [ "$READY" = false ]; then
+    echo ""
+    print_error "Neo4j failed to start after 60 seconds"
+    print_info "Check logs: docker logs puppygraph_neo4j"
+    exit 1
+fi
 
 # Wait for PuppyGraph
 echo -n "PuppyGraph: "
+READY=false
 for i in {1..30}; do
-    if docker exec puppygraph_puppygraph wget --no-verbose --tries=1 --spider http://localhost:8081 &> /dev/null 2>&1; then
+    if docker exec puppygraph_puppygraph wget --no-verbose --tries=1 --spider http://localhost:8081 &> /dev/null; then
         print_success "Ready"
+        READY=true
         break
     fi
     echo -n "."
     sleep 1
 done
+if [ "$READY" = false ]; then
+    echo ""
+    print_error "PuppyGraph failed to start after 30 seconds"
+    print_info "Check logs: docker logs puppygraph_puppygraph"
+    exit 1
+fi
 
 # Step 4: Show database info
 echo ""
