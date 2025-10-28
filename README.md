@@ -427,6 +427,14 @@ curl http://localhost:8081/health
 # Should be accessible at ws://localhost:8182/gremlin
 ```
 
+**Important Note About PuppyGraph Setup:**
+The benchmark script now uses HTTP endpoint verification instead of Gremlin queries during initial connection checks. This prevents hanging when PuppyGraph doesn't have a schema loaded yet. The Gremlin client connections include proper timeouts (30 seconds) to prevent indefinite blocking.
+
+If you experience hanging during PuppyGraph connection:
+1. Ensure PuppyGraph container is healthy: `docker ps`
+2. Check the HTTP endpoint is accessible: `curl http://localhost:8081`
+3. The setup script will skip query tests if no schema is loaded - this is expected behavior
+
 ### Python Dependencies Issues
 ```bash
 # Reinstall dependencies

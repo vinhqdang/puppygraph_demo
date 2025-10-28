@@ -233,7 +233,9 @@ class PuppyGraphQueries(QueryBenchmark):
         self.client = client.Client(
             gremlin_url,
             'g',
-            message_serializer=serializer.GraphSONSerializersV2d0()
+            message_serializer=serializer.GraphSONSerializersV2d0(),
+            pool_size=4,
+            max_workers=4
         )
 
     def two_hop_aggregation(self, customer_id: str) -> Dict[str, Any]:
@@ -269,7 +271,7 @@ class PuppyGraphQueries(QueryBenchmark):
         """
 
         try:
-            result = self.client.submit(query, {'customer_id': customer_id}).all().result()
+            result = self.client.submit(query, {'customer_id': customer_id}).all().result(timeout=30)
 
             if not result or len(result) == 0:
                 return {
