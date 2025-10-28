@@ -4,7 +4,7 @@
       "name": "postgres_banking",
       "type": "postgresql",
       "jdbc": {
-        "jdbcUri": "jdbc:postgresql://localhost:5432/banking_db",
+        "jdbcUri": "jdbc:postgresql://postgres:5432/banking_db",
         "username": "postgres",
         "password": "postgres",
         "driverClass": "org.postgresql.Driver"

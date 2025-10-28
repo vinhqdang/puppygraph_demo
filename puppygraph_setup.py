@@ -61,7 +61,9 @@ class PuppyGraphSetup:
                     "name": "postgres_banking",
                     "type": "postgresql",
                     "jdbc": {
-                        "jdbcUri": f"jdbc:postgresql://{self.config.POSTGRES_HOST}:{self.config.POSTGRES_PORT}/{self.config.POSTGRES_DB}",
+                        # Use Docker service name 'postgres' instead of localhost
+                        # since PuppyGraph runs in Docker and needs to access the postgres container
+                        "jdbcUri": f"jdbc:postgresql://postgres:{self.config.POSTGRES_PORT}/{self.config.POSTGRES_DB}",
                         "username": self.config.POSTGRES_USER,
                         "password": self.config.POSTGRES_PASSWORD,
                         "driverClass": "org.postgresql.Driver"
