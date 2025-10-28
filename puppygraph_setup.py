@@ -101,12 +101,12 @@ class PuppyGraphSetup:
                                     "alias": "email"
                                 },
                                 {
-                                    "type": "Double",
+                                    "type": "DECIMAL(15,2)",
                                     "field": "account_balance",
                                     "alias": "account_balance"
                                 },
                                 {
-                                    "type": "Double",
+                                    "type": "DECIMAL(5,2)",
                                     "field": "risk_score",
                                     "alias": "risk_score"
                                 },
@@ -116,7 +116,7 @@ class PuppyGraphSetup:
                                     "alias": "account_type"
                                 },
                                 {
-                                    "type": "String",
+                                    "type": "DATE",
                                     "field": "registration_date",
                                     "alias": "registration_date"
                                 }
@@ -163,12 +163,12 @@ class PuppyGraphSetup:
                         },
                         "attributes": [
                             {
-                                "type": "Double",
+                                "type": "DECIMAL(15,2)",
                                 "field": "amount",
                                 "alias": "amount"
                             },
                             {
-                                "type": "String",
+                                "type": "DATETIME",
                                 "field": "transaction_date",
                                 "alias": "transaction_date"
                             },
