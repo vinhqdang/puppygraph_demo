@@ -59,7 +59,7 @@ class PuppyGraphSetup:
             "catalogs": [
                 {
                     "name": "postgres_banking",
-                    "type": "postgres",
+                    "type": "postgresql",
                     "jdbc": {
                         "jdbcUri": f"jdbc:postgresql://{self.config.POSTGRES_HOST}:{self.config.POSTGRES_PORT}/{self.config.POSTGRES_DB}",
                         "username": self.config.POSTGRES_USER,

@@ -2,7 +2,7 @@
   "catalogs": [
     {
       "name": "postgres_banking",
-      "type": "postgres",
+      "type": "postgresql",
       "jdbc": {
         "jdbcUri": "jdbc:postgresql://localhost:5432/banking_db",
         "username": "postgres",
