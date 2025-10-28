@@ -123,6 +123,9 @@ This automated script will:
 5. Run performance benchmark on all three systems
 6. Stop all databases when complete
 
+**⚠️ IMPORTANT - Manual Step Required:**
+PuppyGraph requires manual schema loading via the web UI (http://localhost:8081). The script will pause and prompt you to load the schema. See the **[PuppyGraph Manual Schema Loading](#️-important-puppygraph-manual-schema-loading)** section for detailed instructions.
+
 **Note:** Make sure you have activated the conda environment (py310) before running the script.
 
 **Alternative (step-by-step):**
@@ -202,6 +205,41 @@ docker compose restart
   - HTTP API: `localhost:8081`
   - Gremlin: `localhost:8182`
   - Password: puppygraph123
+  - **Web UI**: `http://localhost:8081` (for schema loading)
+
+### ⚠️ IMPORTANT: PuppyGraph Manual Schema Loading
+
+PuppyGraph requires manual schema loading via the web UI. This is a **required step** before running benchmarks.
+
+**Step-by-Step Instructions:**
+
+1. **Ensure containers are running:**
+   ```bash
+   docker compose up -d
+   # Wait 10-15 seconds for PuppyGraph to be fully ready
+   ```
+
+2. **Open PuppyGraph Web UI:**
+   - Navigate to: `http://localhost:8081`
+   - Login with password: `puppygraph123`
+
+3. **Load the schema:**
+   - The schema file is located at: `puppygraph_schema.json`
+   - In the web UI, navigate to the **Schema** or **Configuration** section
+   - Upload or paste the contents of `puppygraph_schema.json`
+   - Click **Save** or **Apply** to load the schema
+
+4. **Verify schema is loaded:**
+   - The schema connects to PostgreSQL database running in Docker
+   - Check that the connection is successful (you should see "Customer" vertex and "TRANSFERRED" edge)
+   - PuppyGraph will query data directly from PostgreSQL via JDBC
+
+**Schema Details:**
+- **Catalog**: PostgreSQL database (`postgres:5432/banking_db`)
+- **Vertex**: Customer (with attributes: name, email, account_balance, risk_score, etc.)
+- **Edge**: TRANSFERRED (connecting Customer → Customer with transaction details)
+
+**Note:** The schema uses the Docker service name `postgres` to connect to the PostgreSQL container. This is correct for Docker networking.
 
 ### Option 2: Manual Installation
 
