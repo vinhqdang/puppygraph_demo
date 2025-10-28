@@ -50,34 +50,140 @@ class PuppyGraphSetup:
     def create_schema_config(self) -> dict:
         """
         Create PuppyGraph schema configuration for banking data.
+        Uses PostgreSQL as the data catalog.
 
         Returns:
             Schema configuration dictionary
         """
-        # Use Docker container path since PuppyGraph runs in Docker
-        # The data directory is mounted as /data in the container
-        data_dir = "/data"
-
-        # Simplified schema format for PuppyGraph
-        # PuppyGraph will auto-detect column names from CSV headers
         schema = {
-            "vertices": [
+            "catalogs": [
                 {
-                    "label": "Customer",
-                    "file": f"{data_dir}/customers.csv",
-                    "id": "customer_id"
+                    "name": "postgres_banking",
+                    "type": "postgres",
+                    "jdbc": {
+                        "jdbcUri": f"jdbc:postgresql://{self.config.POSTGRES_HOST}:{self.config.POSTGRES_PORT}/{self.config.POSTGRES_DB}",
+                        "username": self.config.POSTGRES_USER,
+                        "password": self.config.POSTGRES_PASSWORD,
+                        "driverClass": "org.postgresql.Driver"
+                    }
                 }
             ],
-            "edges": [
-                {
-                    "label": "TRANSFERRED",
-                    "file": f"{data_dir}/transactions.csv",
-                    "from": "Customer",
-                    "from_id": "from_customer_id",
-                    "to": "Customer",
-                    "to_id": "to_customer_id"
-                }
-            ]
+            "graph": {
+                "vertices": [
+                    {
+                        "label": "Customer",
+                        "oneToOne": {
+                            "tableSource": {
+                                "catalog": "postgres_banking",
+                                "schema": "public",
+                                "table": "customers"
+                            },
+                            "id": {
+                                "fields": [
+                                    {
+                                        "type": "String",
+                                        "field": "customer_id",
+                                        "alias": "customer_id"
+                                    }
+                                ]
+                            },
+                            "attributes": [
+                                {
+                                    "type": "String",
+                                    "field": "name",
+                                    "alias": "name"
+                                },
+                                {
+                                    "type": "String",
+                                    "field": "email",
+                                    "alias": "email"
+                                },
+                                {
+                                    "type": "Double",
+                                    "field": "account_balance",
+                                    "alias": "account_balance"
+                                },
+                                {
+                                    "type": "Double",
+                                    "field": "risk_score",
+                                    "alias": "risk_score"
+                                },
+                                {
+                                    "type": "String",
+                                    "field": "account_type",
+                                    "alias": "account_type"
+                                },
+                                {
+                                    "type": "String",
+                                    "field": "registration_date",
+                                    "alias": "registration_date"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "edges": [
+                    {
+                        "label": "TRANSFERRED",
+                        "fromVertex": "Customer",
+                        "toVertex": "Customer",
+                        "tableSource": {
+                            "catalog": "postgres_banking",
+                            "schema": "public",
+                            "table": "transactions"
+                        },
+                        "id": {
+                            "fields": [
+                                {
+                                    "type": "String",
+                                    "field": "transaction_id",
+                                    "alias": "transaction_id"
+                                }
+                            ]
+                        },
+                        "fromId": {
+                            "fields": [
+                                {
+                                    "type": "String",
+                                    "field": "from_customer_id",
+                                    "alias": "from_customer_id"
+                                }
+                            ]
+                        },
+                        "toId": {
+                            "fields": [
+                                {
+                                    "type": "String",
+                                    "field": "to_customer_id",
+                                    "alias": "to_customer_id"
+                                }
+                            ]
+                        },
+                        "attributes": [
+                            {
+                                "type": "Double",
+                                "field": "amount",
+                                "alias": "amount"
+                            },
+                            {
+                                "type": "String",
+                                "field": "transaction_date",
+                                "alias": "transaction_date"
+                            },
+                            {
+                                "type": "String",
+                                "field": "transaction_type",
+                                "alias": "transaction_type"
+                            },
+                            {
+                                "type": "String",
+                                "field": "status",
+                                "alias": "status"
+                            }
+                        ]
+                    }
+                ]
+            }
         }
 
         return schema

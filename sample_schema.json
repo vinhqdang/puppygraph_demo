@@ -1,0 +1,168 @@
+{
+  "catalogs": [
+    {
+      "name": "duckdb_data",
+      "type": "duckdb",
+      "jdbc": {
+        "jdbcUri": "jdbc:duckdb:/home/ubuntu/test.db",
+        "driverClass": "org.duckdb.DuckDBDriver"
+      }
+    }
+  ],
+  "graph": {
+    "vertices": [
+      {
+        "label": "person",
+        "oneToOne": {
+          "tableSource": {
+            "catalog": "duckdb_data",
+            "schema": "modern",
+            "table": "person"
+          },
+          "id": {
+            "fields": [
+              {
+                "type": "String",
+                "field": "id",
+                "alias": "id"
+              }
+            ]
+          },
+          "attributes": [
+            {
+              "type": "Int",
+              "field": "age",
+              "alias": "age"
+            },
+            {
+              "type": "String",
+              "field": "name",
+              "alias": "name"
+            }
+          ]
+        }
+      },
+      {
+        "label": "software",
+        "oneToOne": {
+          "tableSource": {
+            "catalog": "duckdb_data",
+            "schema": "modern",
+            "table": "software"
+          },
+          "id": {
+            "fields": [
+              {
+                "type": "String",
+                "field": "id",
+                "alias": "id"
+              }
+            ]
+          },
+          "attributes": [
+            {
+              "type": "String",
+              "field": "lang",
+              "alias": "lang"
+            },
+            {
+              "type": "String",
+              "field": "name",
+              "alias": "name"
+            }
+          ]
+        }
+      }
+    ],
+    "edges": [
+      {
+        "label": "knows",
+        "fromVertex": "person",
+        "toVertex": "person",
+        "tableSource": {
+          "catalog": "duckdb_data",
+          "schema": "modern",
+          "table": "knows"
+        },
+        "id": {
+          "fields": [
+            {
+              "type": "String",
+              "field": "id",
+              "alias": "id"
+            }
+          ]
+        },
+        "fromId": {
+          "fields": [
+            {
+              "type": "String",
+              "field": "from_id",
+              "alias": "from_id"
+            }
+          ]
+        },
+        "toId": {
+          "fields": [
+            {
+              "type": "String",
+              "field": "to_id",
+              "alias": "to_id"
+            }
+          ]
+        },
+        "attributes": [
+          {
+            "type": "Double",
+            "field": "weight",
+            "alias": "weight"
+          }
+        ]
+      },
+      {
+        "label": "created",
+        "fromVertex": "person",
+        "toVertex": "software",
+        "tableSource": {
+          "catalog": "duckdb_data",
+          "schema": "modern",
+          "table": "created"
+        },
+        "id": {
+          "fields": [
+            {
+              "type": "String",
+              "field": "id",
+              "alias": "id"
+            }
+          ]
+        },
+        "fromId": {
+          "fields": [
+            {
+              "type": "String",
+              "field": "from_id",
+              "alias": "from_id"
+            }
+          ]
+        },
+        "toId": {
+          "fields": [
+            {
+              "type": "String",
+              "field": "to_id",
+              "alias": "to_id"
+            }
+          ]
+        },
+        "attributes": [
+          {
+            "type": "Double",
+            "field": "weight",
+            "alias": "weight"
+          }
+        ]
+      }
+    ]
+  }
+}

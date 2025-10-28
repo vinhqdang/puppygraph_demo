@@ -217,8 +217,7 @@ results/
 *.jpg
 *.jpeg
 
-# PuppyGraph schema (generated)
-puppygraph_schema.json
+# PuppyGraph schema (now tracked in git with correct format)
 
 # IDE
 .vscode/
