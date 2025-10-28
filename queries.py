@@ -301,7 +301,13 @@ class PuppyGraphQueries(QueryBenchmark):
             return features
 
         except Exception as e:
-            print(f"Error executing PuppyGraph query: {e}")
+            error_msg = str(e)
+            if "timeout" in error_msg.lower():
+                print(f"PuppyGraph query timeout - schema may not be loaded")
+            elif "no schema" in error_msg.lower() or "not found" in error_msg.lower():
+                print(f"PuppyGraph schema not loaded - skipping query")
+            else:
+                print(f"PuppyGraph query error: {error_msg[:100]}")
             return {
                 'num_unique_2hop_receivers': 0,
                 'num_2hop_transactions': 0,

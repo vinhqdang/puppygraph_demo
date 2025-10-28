@@ -192,7 +192,26 @@ class PerformanceBenchmark:
 
             # Warm-up query
             print("Running warm-up query...")
-            pg_queries.two_hop_aggregation(customer_ids[0])
+            warmup_result = pg_queries.two_hop_aggregation(customer_ids[0])
+
+            # Check if query returned valid results (not all zeros)
+            if warmup_result.get('num_2hop_transactions', 0) == 0:
+                print("\n⚠️  WARNING: PuppyGraph schema not loaded!")
+                print("PuppyGraph queries are returning empty results.")
+                print("Please load the schema via the web UI: http://localhost:8081")
+                print("Schema file: puppygraph_schema.json")
+                print("\nSkipping PuppyGraph benchmark...\n")
+
+                pg_queries.close()
+                return {
+                    'database': 'PuppyGraph',
+                    'error': 'Schema not loaded - please configure PuppyGraph via web UI',
+                    'single_query_time': None,
+                    'batch_total_time': None,
+                    'batch_size': len(customer_ids),
+                    'avg_query_time': None,
+                    'queries_per_second': None
+                }
 
             # Benchmark single query
             print("Benchmarking single query...")
@@ -228,7 +247,10 @@ class PerformanceBenchmark:
             return benchmark_results
 
         except Exception as e:
-            print(f"Error benchmarking PuppyGraph: {e}")
+            print(f"\n⚠️  PuppyGraph benchmark failed: {e}")
+            print("This is likely because the schema hasn't been loaded.")
+            print("PuppyGraph requires manual schema configuration via web UI.")
+            print("See puppygraph_setup.py output for instructions.\n")
             return {
                 'database': 'PuppyGraph',
                 'error': str(e),
@@ -253,6 +275,24 @@ class PerformanceBenchmark:
         print("PERFORMANCE COMPARISON REPORT")
         print("=" * 80)
 
+        # Check if any database failed
+        failed_dbs = []
+        if 'error' in postgres_results:
+            failed_dbs.append('PostgreSQL')
+        if 'error' in neo4j_results:
+            failed_dbs.append('Neo4j')
+        if 'error' in puppygraph_results:
+            failed_dbs.append('PuppyGraph')
+
+        if failed_dbs:
+            print("\n⚠️  Note: The following databases were unavailable:")
+            for db in failed_dbs:
+                print(f"   - {db}")
+            if 'PuppyGraph' in failed_dbs:
+                print("\n   PuppyGraph requires manual schema loading via web UI.")
+                print("   Visit http://localhost:8081 to configure the schema.")
+            print()
+
         # Create summary table
         summary_data = []
         for result in [postgres_results, neo4j_results, puppygraph_results]:
@@ -276,21 +316,28 @@ class PerformanceBenchmark:
         summary_df = pd.DataFrame(summary_data)
         print("\n" + summary_df.to_string(index=False))
 
-        # Calculate speedup factors
-        if 'error' not in postgres_results:
+        # Calculate speedup factors (only if we have valid results)
+        successful_dbs = [r for r in [postgres_results, neo4j_results, puppygraph_results] if 'error' not in r]
+
+        if len(successful_dbs) >= 2:
             print("\n" + "=" * 80)
             print("SPEEDUP ANALYSIS (relative to PostgreSQL)")
             print("=" * 80)
 
-            postgres_time = postgres_results['avg_query_time']
+            if 'error' not in postgres_results:
+                postgres_time = postgres_results['avg_query_time']
 
-            if 'error' not in neo4j_results:
-                neo4j_speedup = postgres_time / neo4j_results['avg_query_time']
-                print(f"Neo4j speedup: {neo4j_speedup:.2f}x")
+                if 'error' not in neo4j_results:
+                    neo4j_speedup = postgres_time / neo4j_results['avg_query_time']
+                    print(f"Neo4j speedup: {neo4j_speedup:.2f}x")
 
-            if 'error' not in puppygraph_results:
-                puppygraph_speedup = postgres_time / puppygraph_results['avg_query_time']
-                print(f"PuppyGraph speedup: {puppygraph_speedup:.2f}x")
+                if 'error' not in puppygraph_results:
+                    puppygraph_speedup = postgres_time / puppygraph_results['avg_query_time']
+                    print(f"PuppyGraph speedup: {puppygraph_speedup:.2f}x")
+            else:
+                print("Cannot calculate speedup - PostgreSQL benchmark unavailable")
+        else:
+            print("\n⚠️  Insufficient data for speedup analysis (need at least 2 databases)")
 
         # Save results
         self.save_results(postgres_results, neo4j_results, puppygraph_results)
