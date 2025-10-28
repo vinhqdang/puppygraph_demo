@@ -1,0 +1,18 @@
+# Database Drivers
+psycopg2-binary==2.9.9
+neo4j==5.15.0
+gremlinpython==3.7.1
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.2
+
+# Visualization
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# HTTP Requests
+requests==2.31.0
+
+# Utilities
+python-dateutil==2.8.2

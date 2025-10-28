@@ -205,3 +205,28 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project-specific
+# Generated data files
+data/
+*.csv
+
+# Benchmark results
+results/
+*.png
+*.jpg
+*.jpeg
+
+# PuppyGraph schema (generated)
+puppygraph_schema.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
